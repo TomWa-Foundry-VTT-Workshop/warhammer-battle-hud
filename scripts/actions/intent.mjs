@@ -46,7 +46,7 @@ export function resolveIntent(type, mods = {}, settings = {}) {
   if (type === T.advantageAction || type === T.gangOrder) return { intent: right ? "none" : "use" };
 
   // Między przygodami i czyszczenie splatania: lewy klik wykonuje
-  if ([T.income, T.rest, T.endeavour, T.channelReset].includes(type)) return { intent: right ? "none" : "use" };
+  if ([T.income, T.careerCheck, T.rest, T.endeavour, T.channelReset].includes(type)) return { intent: right ? "none" : "use" };
 
   if (right) return { intent: ITEM_BACKED.has(type) ? "sheet" : "none" };
 

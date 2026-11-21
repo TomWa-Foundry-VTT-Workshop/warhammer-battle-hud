@@ -431,6 +431,14 @@ export function buildDowntime(actor, env) {
       info1: status?.value ? { text: String(status.value) } : undefined,
       details: [tip(env, "Career", (career ?? path).name), tip(env, "Status", status?.value)]
     });
+    // Sprawdzenie zmiany profesji: wynik tylko dla gracza na czacie
+    out.push({
+      id: T.careerCheck,
+      name: env.localize("WFRP4E_HUD.CareerCheck"),
+      encodedValue: encodeAction(T.careerCheck),
+      details: [tip(env, "Career", career?.name ?? actor.system?.career?.current?.name ?? path.name)],
+      tooltip: env.localize("WFRP4E_HUD.CareerCheckText")
+    });
   }
   out.push({
     id: T.rest,

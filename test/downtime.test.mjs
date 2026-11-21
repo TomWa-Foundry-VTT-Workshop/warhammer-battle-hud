@@ -15,8 +15,9 @@ describe("WFRP: między przygodami", () => {
   it("dochód z bieżącej kariery ze Statusem, odpoczynek i przedsięwzięcia", () => {
     const pages = [{ uuid: "JournalEntry.j.JournalEntryPage.p", name: "Consult an Expert", text: { content: "<p>Ask a scholar</p>" } }];
     const actions = B.buildDowntime(merchant, { ...env, endeavours: pages });
-    expect(actions.map((a) => [a.encodedValue, a.info1?.text])).toEqual([["income", "Silver 5"], ["rest", undefined], ["endeavour|JournalEntry.j.JournalEntryPage.p", undefined]]);
+    expect(actions.map((a) => [a.encodedValue, a.info1?.text])).toEqual([["income", "Silver 5"], ["careerCheck", undefined], ["rest", undefined], ["endeavour|JournalEntry.j.JournalEntryPage.p", undefined]]);
     expect(actions[0].details.find((d) => d.label.endsWith("Career")).value).toBe("Kupiec");
+    expect(actions[1].details.find((d) => d.label.endsWith("Career")).value).toBe("Kupiec");
   });
   it("bez kariery nie ma dochodu, stwory i pojazdy nie mają tej zakładki", () => {
     expect(B.buildDowntime({ type: "character", system: {}, itemTypes: {} }, env).map((a) => a.encodedValue)).toEqual(["rest"]);

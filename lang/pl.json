@@ -256,11 +256,31 @@
       "Income": "Klik: test Zarobkowania umiejętnością bieżącej kariery",
       "Rest": "Klik: odpoczynek – test Odporności na odzyskanie Żywotności",
       "Endeavour": "Klik: otwórz przedsięwzięcie (na jego stronie jest przycisk wykonania)",
-      "ChannelReset": "Klik: porzuć całe splecione PS (np. po utracie skupienia)"
+      "ChannelReset": "Klik: porzuć całe splecione PS (np. po utracie skupienia)",
+      "CareerCheck": "Klik: sprawdź profesję (odpowiedź widzisz tylko Ty)"
     },
     "Income": "Dochód",
     "Rest": "Odpoczynek",
-    "ChannelledReset": "Utrata splecionej mocy"
+    "ChannelledReset": "Utrata splecionej mocy",
+    "CareerCheck": "Sprawdź profesję",
+    "CareerCheckText": "Sprawdza, czy obecny poziom profesji jest ukończony i ile kosztuje awans albo zmiana profesji. Odpowiedź na czacie widzisz tylko Ty.",
+    "Career": {
+      "Characteristics": "Cechy z {needed} rozwinięciami",
+      "Skills": "Umiejętności profesji z {needed} rozwinięciami: {done}/{required}",
+      "Talent": "Talent profesji",
+      "NotTrained": "nie wykupiona",
+      "SkillsToRaise": "Umiejętności do rozwinięcia",
+      "TalentsToLearn": "Wykup jeden z",
+      "Advancements": "Postępy na tym poziomie: {done}/{needed}",
+      "MissingAdvancements": "Brakuje {missing} postępów do ukończenia poziomu.",
+      "Complete": "Ten poziom profesji jest ukończony.",
+      "Incomplete": "Ten poziom profesji nie jest jeszcze ukończony.",
+      "Xp": "Doświadczenie do wydania: {xp} PD.",
+      "NextLevel": "{ok} Następny poziom tej profesji: {cost} PD (dopiero po ukończeniu poziomu).",
+      "NextLevel5e": "{ok} Następny poziom ({next}): {cost} PD.",
+      "LastLevel": "To ostatni poziom tej ścieżki kariery.",
+      "Change": "Zmiana profesji: {okSame} {same} PD w tej samej klasie, {okOther} {other} PD w innej klasie."
+    }
   },
   "WHB_TOW": {
     "Reload": "Przeładuj",

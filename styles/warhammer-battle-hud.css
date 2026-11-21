@@ -1031,3 +1031,22 @@ body.whb-system-age-of-sigmar-soulbound {
   font-weight: bold;
   opacity: 1;
 }
+
+/* Sprawdzenie profesji na czacie */
+.chat-message ul.whb-career {
+  margin: 0.25rem 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.chat-message ul.whb-career li {
+  margin: 0.15rem 0;
+}
+
+.chat-message .whb-career .whb-ok {
+  color: #2e7d32;
+}
+
+.chat-message .whb-career .whb-missing {
+  color: #b23b2e;
+}

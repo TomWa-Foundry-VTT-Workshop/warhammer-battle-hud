@@ -6,6 +6,8 @@
  */
 import { ACTION_TYPES as T } from "./encoding.mjs";
 import { t, log } from "./constants.mjs";
+import { careerCheck4e, careerCheck5e, careerCosts } from "./career-check.mjs";
+import { escapeHtml } from "./tooltip.mjs";
 
 /** Kontekst testu dla systemu: pominięcie dialogu i wymuszony tryb rzutu. */
 function testContext({ skipDialog, rollMode }) {
@@ -138,6 +140,75 @@ async function rollIncome(actor) {
   }));
 }
 
+/** Dane do sprawdzenia kariery: 5e (ścieżka kariery) albo 4e (bieżąca kariera). */
+function careerReport(actor) {
+  const current5e = actor.system.career?.current;
+  if (actor.itemTypes.careerPath?.length && current5e) {
+    const level = Number(current5e.level) || 1;
+    const next = actor.system.career.document?.system?.getTier?.(level + 1);
+    return { name: current5e.name, report: careerCheck5e({ level, done: current5e.advancement?.length ?? 0, needed: current5e.advancementsNeeded, next: next?.name }) };
+  }
+  const career = actor.itemTypes.career?.find((c) => c.system.current?.value);
+  if (!career) return null;
+  const labels = game.wfrp4e?.config?.characteristics ?? {};
+  const report = careerCheck4e({
+    level: career.system.level?.value,
+    characteristics: Object.keys(career.system.characteristics ?? {})
+      .filter((key) => career.system.characteristics[key])
+      .map((key) => ({ key, label: game.i18n.localize(labels[key] ?? key), advances: actor.system.characteristics?.[key]?.advances })),
+    careerSkills: [...(career.system.skills ?? []), ...(career.system.addedSkills ?? [])],
+    skills: actor.itemTypes.skill.map((s) => ({ name: s.name, advances: s.system.advances?.value })),
+    careerTalents: career.system.talents ?? [],
+    talents: actor.itemTypes.talent.map((tl) => tl.name)
+  });
+  return { name: career.name, report };
+}
+
+const mark = (ok) => (ok ? "✔" : "✘");
+const row = (ok, text) => `<li class="${ok ? "whb-ok" : "whb-missing"}">${mark(ok)} ${text}</li>`;
+
+/** Treść wiadomości o karierze (wszystkie teksty z dokumentów są escapowane). */
+function careerHtml(actor, { name, report }) {
+  const xp = Number(actor.system.details?.experience?.current) || 0;
+  const costs = careerCosts(report);
+  const parts = [`<h3>${escapeHtml(name)}</h3>`];
+  if (report.edition === "5e") {
+    parts.push(`<ul class="whb-career">${row(report.complete, t("Career.Advancements", { done: report.done, needed: report.needed }))}</ul>`);
+    if (!report.complete) parts.push(`<p>${t("Career.MissingAdvancements", { missing: report.missing })}</p>`);
+  } else {
+    const chars = report.characteristics.map((c) => `${escapeHtml(c.label)} ${c.advances}/${report.needed}`).join(", ");
+    const missingSkills = report.skills.rows.filter((s) => !s.ok).map((s) => `${escapeHtml(s.name)} ${s.owned ? `${s.advances}/${report.needed}` : `(${t("Career.NotTrained")})`}`);
+    parts.push(`<ul class="whb-career">
+      ${row(report.parts.characteristics, `${t("Career.Characteristics", { needed: report.needed })}: ${chars || "—"}`)}
+      ${row(report.parts.skills, t("Career.Skills", { done: report.skills.done, required: report.skills.required, needed: report.needed }))}
+      ${row(report.parts.talent, `${t("Career.Talent")}: ${report.talents.owned.length ? escapeHtml(report.talents.owned.join(", ")) : "—"}`)}
+    </ul>`);
+    if (!report.parts.skills && missingSkills.length) parts.push(`<p><strong>${t("Career.SkillsToRaise")}:</strong> ${missingSkills.join(", ")}</p>`);
+    if (!report.parts.talent) parts.push(`<p><strong>${t("Career.TalentsToLearn")}:</strong> ${escapeHtml(report.talents.all.join(", "))}</p>`);
+  }
+  parts.push(`<p><strong>${t(report.complete ? "Career.Complete" : "Career.Incomplete")}</strong></p>`);
+  const lines = [];
+  if (report.edition === "5e") {
+    if (report.next) lines.push(t("Career.NextLevel5e", { next: escapeHtml(report.next), cost: costs.nextLevel, ok: mark(report.complete && xp >= costs.nextLevel) }));
+    else lines.push(t("Career.LastLevel"));
+  } else lines.push(t("Career.NextLevel", { cost: costs.nextLevel, ok: mark(report.complete && xp >= costs.nextLevel) }));
+  lines.push(t("Career.Change", { same: costs.sameClass, other: costs.otherClass, okSame: mark(xp >= costs.sameClass), okOther: mark(xp >= costs.otherClass) }));
+  parts.push(`<p>${t("Career.Xp", { xp })}</p><ul class="whb-career">${lines.map((line) => `<li>${line}</li>`).join("")}</ul>`);
+  return parts.join("");
+}
+
+/** Sprawdzenie zmiany profesji: wynik na czacie tylko dla gracza, który kliknął. */
+async function checkCareer(actor) {
+  const data = careerReport(actor);
+  if (!data) return ui.notifications.warn(t("Notify.NoCareer"));
+  return ChatMessage.create({
+    content: careerHtml(actor, data),
+    speaker: ChatMessage.getSpeaker({ actor }),
+    flavor: t("CareerCheck"),
+    whisper: [game.user.id]
+  });
+}
+
 /** Odpoczynek jak na karcie: test Odporności (albo Wytrzymałości bez tej umiejętności) z odzyskiwaniem Żywotności. */
 async function rest(actor) {
   const skill = actor.itemTags?.skill?.find((s) => s.name === game.i18n.localize("NAME.Endurance"))
@@ -174,7 +245,7 @@ export async function performAction(actor, action, intent) {
       case "repair": return await damageGear(actor, action, -1);
       case "run": return await runManualScript(actor, action);
       case "use": {
-        const use = { [T.gangOrder]: issueGangOrder, [T.income]: rollIncome, [T.rest]: rest, [T.endeavour]: openEndeavour, [T.channelReset]: resetChannelling }[action.type];
+        const use = { [T.gangOrder]: issueGangOrder, [T.income]: rollIncome, [T.careerCheck]: checkCareer, [T.rest]: rest, [T.endeavour]: openEndeavour, [T.channelReset]: resetChannelling }[action.type];
         return await (use ?? useAdvantageAction)(actor, action);
       }
       case "increase":

@@ -68,6 +68,7 @@ const HINTS = {
   [T.advantageAction]: "AdvantageAction",
   [T.gangOrder]: "GangOrder",
   [T.income]: "Income",
+  [T.careerCheck]: "CareerCheck",
   [T.rest]: "Rest",
   [T.endeavour]: "Endeavour",
   [T.channelReset]: "ChannelReset"

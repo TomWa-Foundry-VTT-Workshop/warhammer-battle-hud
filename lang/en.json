@@ -256,11 +256,31 @@
       "Income": "Click: Income test with the current career's earning skill",
       "Rest": "Click: rest – Endurance test to recover Wounds",
       "Endeavour": "Click: open the endeavour (its page has the Perform button)",
-      "ChannelReset": "Click: drop all channelled SL (for example after a lost concentration)"
+      "ChannelReset": "Click: drop all channelled SL (for example after a lost concentration)",
+      "CareerCheck": "Click: check the career (only you see the answer)"
     },
     "Income": "Income",
     "Rest": "Rest",
-    "ChannelledReset": "Lose the channelled power"
+    "ChannelledReset": "Lose the channelled power",
+    "CareerCheck": "Career check",
+    "CareerCheckText": "Checks whether the current career level is complete and what moving up or changing career costs. Only you see the answer in chat.",
+    "Career": {
+      "Characteristics": "Characteristics at {needed} advances",
+      "Skills": "Career skills at {needed} advances: {done}/{required}",
+      "Talent": "A career talent",
+      "NotTrained": "not trained",
+      "SkillsToRaise": "Skills to raise",
+      "TalentsToLearn": "Learn one of",
+      "Advancements": "Advancements on this level: {done}/{needed}",
+      "MissingAdvancements": "{missing} more advancement(s) needed to complete this level.",
+      "Complete": "This career level is complete.",
+      "Incomplete": "This career level is not complete yet.",
+      "Xp": "Experience to spend: {xp} XP.",
+      "NextLevel": "{ok} Next level of this career: {cost} XP (only once the level is complete).",
+      "NextLevel5e": "{ok} Next level ({next}): {cost} XP.",
+      "LastLevel": "This is the last level of the career path.",
+      "Change": "Change career: {okSame} {same} XP in the same class, {okOther} {other} XP in another class."
+    }
   },
   "WHB_TOW": {
     "Reload": "Reload",
