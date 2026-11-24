@@ -214,7 +214,12 @@
       "EffectMissing": "Ten skrypt efektu nie jest już dostępny.",
       "ActionFailed": "Akcja nie powiodła się. Szczegóły w konsoli (F12).",
       "NotEnoughAdvantage": "Za mało Przewagi: koszt {cost}, masz {current}.",
-      "NoCareer": "Ta postać nie ma bieżącej kariery."
+      "NoCareer": "Ta postać nie ma bieżącej kariery.",
+      "CustomMissing": "Tej akcji za Przewagę już nie ma.",
+      "NotOwner": "Ta postać nie jest Twoja.",
+      "MacroMissing": "Makra tej akcji już nie ma. Przewaga nie została wydana.",
+      "MacroUntrusted": "Makro tej akcji może edytować gracz, więc HUD go nie uruchomi. Poproś MG o makro, które może edytować tylko MG. Przewaga nie została wydana.",
+      "MacroNoAccess": "Nie masz dostępu do makra tej akcji. Poproś MG o dostęp. Przewaga nie została wydana."
     },
     "Tip": {
       "Initial": "Początkowa",
@@ -312,6 +317,28 @@
       "NextLevel5e": "{ok} Następny poziom ({next}): {cost} PD.",
       "LastLevel": "To ostatni poziom tej ścieżki kariery.",
       "Change": "Zmiana profesji: {okSame} {same} PD w tej samej klasie, {okOther} {other} PD w innej klasie."
+    },
+    "Customize": {
+      "MenuName": "Dostosuj HUD",
+      "MenuLabel": "Dostosuj",
+      "MenuHint": "Własne akcje za Przewagę w zakładce Przewaga (WFRP, 4. edycja).",
+      "Title": "Dostosuj HUD",
+      "AdvantageActions": "Akcje za Przewagę",
+      "AdvantageActionsHint": "Pojawiają się w zakładce Przewaga po akcjach systemu. Kliknięcie odejmuje koszt od Przewagi, wpisuje akcję na czat i uruchamia makro, jeśli je wybrano. Makro uruchamia gracz, który kliknął, więc gracze muszą mieć do makra uprawnienie co najmniej „Ograniczone”. Lista pokazuje tylko makra, których nie może edytować żaden gracz.",
+      "Name": "Nazwa",
+      "Cost": "Koszt",
+      "Description": "Opis",
+      "Macro": "Makro",
+      "NoMacro": "Bez makra",
+      "NoAccess": "gracze nie mają dostępu",
+      "MacroUntrusted": "gracz może je edytować",
+      "MacroGone": "Usunięte makro",
+      "Add": "Dodaj akcję",
+      "Delete": "Usuń",
+      "Save": "Zapisz",
+      "Empty": "Nie ma jeszcze żadnej akcji.",
+      "Limit": "Najwyżej {max} akcji.",
+      "Invalid": "Każda akcja musi mieć nazwę i koszt od 0 do 10 (liczba całkowita)."
     }
   },
   "WHB_TOW": {

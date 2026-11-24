@@ -8,6 +8,8 @@ import { ACTION_TYPES as T } from "./encoding.mjs";
 import { t, log } from "./constants.mjs";
 import { careerCheck4e, careerCheck5e, careerCosts } from "./career-check.mjs";
 import { escapeHtml } from "./tooltip.mjs";
+import { currentAdvantage, customAdvantageChatHtml, macroTrusted, spendAdvantage, useCustomAdvantage } from "./custom-advantage.mjs";
+import { getSetting } from "../bar/settings.mjs";
 
 /** Kontekst testu dla systemu: pominięcie dialogu i wymuszony tryb rzutu. */
 function testContext({ skipDialog, rollMode }) {
@@ -94,12 +96,8 @@ async function useAdvantageAction(actor, action) {
   const entry = game.wfrp4e?.config?.groupAdvantageActions?.[Number(action.id)];
   if (!entry) return;
   const cost = Number(entry.cost) || 0;
-  const path = "system.status.advantage.value";
-  const current = Number(foundry.utils.getProperty(actor, path)) || 0;
-  if (cost > current) return ui.notifications.warn(t("Notify.NotEnoughAdvantage", { cost, current }));
-  if (typeof actor.spend === "function") {
-    if (!(await actor.spend(path, cost))) return ui.notifications.warn(t("Notify.NotEnoughAdvantage", { cost, current }));
-  } else await actor.update({ [path]: current - cost });
+  const current = currentAdvantage(actor);
+  if (!(await spendAdvantage(actor, cost))) return ui.notifications.warn(t("Notify.NotEnoughAdvantage", { cost, current }));
 
   const content = await foundry.applications.ux.TextEditor.enrichHTML(`<p><strong>${entry.name}</strong>: ${entry.description ?? ""}</p><p>${entry.effect ?? ""}</p>`);
   await ChatMessage.create({
@@ -109,6 +107,31 @@ async function useAdvantageAction(actor, action) {
   });
   if (entry.test?.type === "characteristic") await runTest(actor.setupCharacteristic(entry.test.value, { appendTitle: ` - ${entry.name}` }));
 }
+
+/** Zaznaczony token aktora, inaczej jego pierwszy aktywny token, inaczej `null`. */
+function actorToken(actor) {
+  return canvas.tokens?.controlled.find((token) => token.actor?.uuid === actor.uuid) ?? actor.getActiveTokens?.()[0] ?? null;
+}
+
+/** Zależności kliknięcia własnej akcji za Przewagę: ustawienie, makra świata, powiadomienia i czat. */
+const customAdvantageDeps = {
+  entries: () => getSetting("advantageActions"),
+  getMacro: (id) => game.macros.get(id),
+  trusted: (macro) => macroTrusted(macro, game.users.contents),
+  warn: (key, data) => ui.notifications.warn(t(`Notify.${key}`, data)),
+  postChat: (actor, entry) => ChatMessage.create({
+    content: customAdvantageChatHtml(entry),
+    speaker: ChatMessage.getSpeaker({ actor }),
+    flavor: entry.cost > 0 ? `${t("Advantage")} (−${entry.cost})` : t("Advantage")
+  }),
+  context: (actor) => {
+    const token = actorToken(actor);
+    return { token, speaker: ChatMessage.getSpeaker({ actor, token: token?.document }) };
+  }
+};
+
+/** Własna akcja za Przewagę z ustawienia modułu. */
+const useCustomAdvantageAction = (actor, action) => useCustomAdvantage(actor, action, customAdvantageDeps);
 
 /** Rozkaz szajki z modułu Underworld – otwiera jego dialog (Dowodzenie, Przewaga albo rozkaz wprost). */
 async function issueGangOrder(actor, action) {
@@ -251,7 +274,7 @@ export async function performAction(actor, action, intent) {
       case "repair": return await damageGear(actor, action, -1);
       case "run": return await runManualScript(actor, action);
       case "use": {
-        const use = { [T.gangOrder]: issueGangOrder, [T.equip]: toggleEquip, [T.income]: rollIncome, [T.careerCheck]: checkCareer, [T.rest]: rest, [T.endeavour]: openEndeavour, [T.channelReset]: resetChannelling }[action.type];
+        const use = { [T.customAdvantage]: useCustomAdvantageAction, [T.gangOrder]: issueGangOrder, [T.equip]: toggleEquip, [T.income]: rollIncome, [T.careerCheck]: checkCareer, [T.rest]: rest, [T.endeavour]: openEndeavour, [T.channelReset]: resetChannelling }[action.type];
         return await (use ?? useAdvantageAction)(actor, action);
       }
       case "increase":

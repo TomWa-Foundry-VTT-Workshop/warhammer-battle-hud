@@ -1329,3 +1329,59 @@ body.whb-system-age-of-sigmar-soulbound.whb-theme-dark {
 .chat-message .whb-career .whb-missing {
   color: #b23b2e;
 }
+
+/* Okno „Dostosuj HUD”: wiersze akcji za Przewagę */
+.whb-customize .whb-customize-rows {
+  max-height: 60vh;
+  margin: 0.5rem 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.whb-customize .whb-customize-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border, #999);
+  border-radius: 4px;
+}
+
+.whb-customize .whb-customize-line {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.whb-customize .whb-customize-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.whb-customize .whb-customize-name,
+.whb-customize .whb-customize-macro {
+  flex: 2;
+}
+
+.whb-customize .whb-customize-cost {
+  flex: 0 0 4.5rem;
+}
+
+.whb-customize .whb-customize-delete,
+.whb-customize .whb-customize-add button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.whb-customize .whb-customize-description textarea {
+  resize: vertical;
+}
+
+.whb-customize .whb-customize-add {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

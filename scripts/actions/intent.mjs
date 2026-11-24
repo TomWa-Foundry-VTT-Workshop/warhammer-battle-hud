@@ -45,8 +45,8 @@ export function resolveIntent(type, mods = {}, settings = {}) {
   // Ekwipunek: lewy klik zakłada albo odkłada, prawy otwiera przedmiot (jak w pozostałych systemach)
   if (type === T.equip) return { intent: right ? "sheet" : "use" };
 
-  // Użycie Przewagi i rozkaz szajki: lewy klik wykonuje, prawy nic nie robi
-  if (type === T.advantageAction || type === T.gangOrder) return { intent: right ? "none" : "use" };
+  // Użycie Przewagi (systemu i własne) i rozkaz szajki: lewy klik wykonuje, prawy nic nie robi
+  if ([T.advantageAction, T.customAdvantage, T.gangOrder].includes(type)) return { intent: right ? "none" : "use" };
 
   // Między przygodami i czyszczenie splatania: lewy klik wykonuje
   if ([T.income, T.careerCheck, T.rest, T.endeavour, T.channelReset].includes(type)) return { intent: right ? "none" : "use" };

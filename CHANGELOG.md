@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- WFRP 4th edition: your own Advantage actions. The GM defines them in the new settings window "Customize the HUD" (name, cost, description and an optional macro). They show up in the Advantage tab after the system's actions. A click takes the cost from Advantage, posts the action to chat and runs the macro for the player who clicked. Nothing is spent when the macro is missing, the player cannot run it or a player can edit it.
+
 ## 0.8.7
 - **WFRP4e Grimoires**: grimoires that are held in hand show up in the Equipment list and in the hands widget. In WFRP a grimoire takes one or two hands, as set on the book; in The Old World clicking it equips or unequips it.
 - WFRP: if taking up a weapon or book fails, the items that were put away to free the hands are taken up again.

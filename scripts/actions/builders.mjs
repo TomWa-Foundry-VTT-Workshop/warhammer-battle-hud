@@ -8,6 +8,7 @@
  */
 import { ACTION_TYPES as T, encodeAction } from "./encoding.mjs";
 import { equippableGrimoires } from "../grimoire-equipment.mjs";
+import { currentAdvantage, normalizeAdvantageActions } from "./custom-advantage.mjs";
 
 /** Grupy HUD (id grup TAH) – układ w scripts/defaults.mjs. */
 export const GROUP_IDS = Object.freeze({
@@ -434,8 +435,6 @@ function costView(cost, current) {
   };
 }
 
-const currentAdvantage = (actor) => Number(actor?.system?.status?.advantage?.value) || 0;
-
 /** Użycia Przewagi z konfiguracji systemu (np. Grzmotnięcie, Sztuczka z Up in Arms), z kosztem. */
 export function buildAdvantageActions(actor, env) {
   if (!actor?.system?.status?.advantage || env.edition === "5e") return [];
@@ -451,6 +450,20 @@ export function buildAdvantageActions(actor, env) {
       ...costView(cost, current)
     };
   });
+}
+
+/** Własne akcje za Przewagę z ustawienia modułu (`env.customAdvantageActions`), z kosztem. */
+export function buildCustomAdvantageActions(actor, env) {
+  if (!actor?.system?.status?.advantage || env.edition === "5e") return [];
+  const current = currentAdvantage(actor);
+  return normalizeAdvantageActions(env.customAdvantageActions).map(({ id, name, cost, description }) => ({
+    id: `${T.customAdvantage}-${id}`,
+    name,
+    encodedValue: encodeAction(T.customAdvantage, id),
+    tooltip: description,
+    details: [tip(env, "Cost", cost || undefined)],
+    ...costView(cost, current)
+  }));
 }
 
 /** Rozkazy taktyczne szajki z modułu Underworld (gdy jest aktywny), z kosztem w Przewadze i wykonawcą. */

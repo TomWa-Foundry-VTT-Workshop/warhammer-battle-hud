@@ -214,7 +214,12 @@
       "EffectMissing": "This effect script is no longer available.",
       "ActionFailed": "The action failed. See the console (F12) for details.",
       "NotEnoughAdvantage": "Not enough Advantage: costs {cost}, you have {current}.",
-      "NoCareer": "This character has no current career."
+      "NoCareer": "This character has no current career.",
+      "CustomMissing": "This Advantage action no longer exists.",
+      "NotOwner": "This character is not yours.",
+      "MacroMissing": "The macro of this action no longer exists. No Advantage was spent.",
+      "MacroUntrusted": "A player can edit the macro of this action, so the HUD will not run it. Ask the GM for a macro that only the GM can edit. No Advantage was spent.",
+      "MacroNoAccess": "You have no access to the macro of this action. Ask the GM for access. No Advantage was spent."
     },
     "Tip": {
       "Initial": "Initial",
@@ -312,6 +317,28 @@
       "NextLevel5e": "{ok} Next level ({next}): {cost} XP.",
       "LastLevel": "This is the last level of the career path.",
       "Change": "Change career: {okSame} {same} XP in the same class, {okOther} {other} XP in another class."
+    },
+    "Customize": {
+      "MenuName": "Customize the HUD",
+      "MenuLabel": "Customize",
+      "MenuHint": "Your own Advantage actions for the Advantage tab (WFRP 4th edition).",
+      "Title": "Customize the HUD",
+      "AdvantageActions": "Advantage actions",
+      "AdvantageActionsHint": "They appear in the Advantage tab after the system's actions. A click takes the cost from Advantage, posts the action to chat and runs the macro, if you chose one. The macro runs for the player who clicks, so players need at least Limited permission on it. Only macros that no player can edit are listed.",
+      "Name": "Name",
+      "Cost": "Cost",
+      "Description": "Description",
+      "Macro": "Macro",
+      "NoMacro": "No macro",
+      "NoAccess": "players have no access",
+      "MacroUntrusted": "a player can edit it",
+      "MacroGone": "Deleted macro",
+      "Add": "Add an action",
+      "Delete": "Delete",
+      "Save": "Save",
+      "Empty": "No actions yet.",
+      "Limit": "Up to {max} actions.",
+      "Invalid": "Each action needs a name and a cost from 0 to 10 (a whole number)."
     }
   },
   "WHB_TOW": {

@@ -9,6 +9,7 @@ import { GROUPS, LAYOUT } from "./layout.mjs";
 import { performAction } from "./wfrp-actions.mjs";
 import { tooltipHtml } from "./tooltip.mjs";
 import { ACTION_TYPES as T } from "./encoding.mjs";
+import { hasSetting } from "../bar/settings.mjs";
 
 const G = B.GROUP_IDS;
 const FULL_ACTORS = ["character", "npc", "creature"];
@@ -38,7 +39,7 @@ export function actionsByGroup(actor, env) {
     [G.effects]: B.buildManualEffects(collectEffects(actor)),
     [G.conditions]: B.buildConditions(actor, env),
     [G.advantage]: B.buildAdvantage(actor, env),
-    [G.advantageActions]: B.buildAdvantageActions(actor, env),
+    [G.advantageActions]: [...B.buildAdvantageActions(actor, env), ...B.buildCustomAdvantageActions(actor, env)],
     [G.downtime]: B.buildDowntime(actor, env),
     [G.channelledReset]: B.buildChannelledReset(actor, env),
     [G.gangOrders]: env.edition === "5e" ? [] : B.buildGangOrders(actor, env),
@@ -66,6 +67,7 @@ const HINTS = {
   [T.condition]: "Counter",
   [T.advantage]: "Counter",
   [T.advantageAction]: "AdvantageAction",
+  [T.customAdvantage]: "AdvantageAction",
   [T.gangOrder]: "GangOrder",
   [T.income]: "Income",
   [T.careerCheck]: "CareerCheck",
@@ -130,7 +132,8 @@ export function wfrpActions(getSetting) {
     conditionValue: (actor, key) => {
       const effect = actor.hasCondition?.(key);
       return effect ? (effect.conditionValue ?? 1) : 0;
-    }
+    },
+    customAdvantageActions: hasSetting("advantageActions") ? getSetting("advantageActions") : []
   });
   const panel = (actor) => buildPanel(actor, env());
   return {

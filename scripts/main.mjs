@@ -15,6 +15,8 @@ import { registerSettings as registerFrameSettings, getSetting as getFrameSettin
 import { adapterFor as framesFor } from "./frames/systems.mjs";
 import { PartyFrames } from "./frames/party-frames.mjs";
 import { wfrpActions } from "./actions/wfrp4e.mjs";
+import { registerAdvantageActions } from "./actions/custom-advantage.mjs";
+import { CustomizeHud } from "./customize/customize-hud.mjs";
 import { towActions } from "./actions/tow.mjs";
 import { imActions } from "./actions/im.mjs";
 import { wngActions } from "./actions/wng.mjs";
@@ -38,6 +40,8 @@ Hooks.once("init", () => {
   BattleBar.adapter = ammoFor(game.system.id);
   registerFrameSettings(refreshFrames);
   registerBarSettings(Boolean(BattleBar.adapter), refreshBar, Boolean(counterFor(game.system.id)), Boolean(handsFor(game.system.id)));
+  // Własne akcje za Przewagę (WFRP4e) i okno „Dostosuj HUD” w ustawieniach modułu
+  registerAdvantageActions(game.settings, { systemId: game.system.id, menuType: CustomizeHud, onChange: refreshBar });
   // Wariant kolorystyki wybrany przez gracza (albo domyślny dla systemu)
   applyTheme();
   // Zasoby spoza aktora (np. Przewaga Taktyczna w ustawieniach świata) odświeżają licznik własnym hookiem
