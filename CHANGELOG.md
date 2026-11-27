@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.8
 - Magic is arranged in columns by school, like skills by characteristic. WFRP: one column per lore with its Wind in the header ("Fire (Aqshy)"); 4th edition has a small channelling button next to each spell instead of a second list, 5th edition a "Channelling" button for the Wind at the top of its lore. The Old World: "Cast" for the lore on top, its spells below, Miscasts apart. Imperium Maledictum and Wrath & Glory: psychic powers by discipline. Soulbound: spells by lore, miracles apart.
 
 ## 0.8.7

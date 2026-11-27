@@ -2,7 +2,7 @@
   "id": "warhammer-battle-hud",
   "title": "TomWa Warhammer HUD",
   "description": "Party frames, an action panel and an ammunition bar for every Warhammer system in Foundry VTT (WFRP 4e/5e, The Old World, Imperium Maledictum, Wrath & Glory, Soulbound).",
-  "version": "0.8.7",
+  "version": "0.8.8",
   "compatibility": {
     "minimum": "14",
     "verified": "14",
