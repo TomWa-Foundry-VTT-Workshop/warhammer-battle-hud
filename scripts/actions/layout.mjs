@@ -10,9 +10,6 @@ export const GROUPS = {
   [G.weaponsRanged]: "WFRP4E_HUD.Groups.Ranged",
   [G.armour]: "WFRP4E_HUD.Groups.Armour",
   [G.traits]: "WFRP4E_HUD.Groups.Traits",
-  [G.petty]: "WFRP4E_HUD.Groups.Petty",
-  [G.spells]: "WFRP4E_HUD.Groups.Spells",
-  [G.channelling]: "WFRP4E_HUD.Groups.Channelling",
   [G.blessings]: "WFRP4E_HUD.Groups.Blessings",
   [G.miracles]: "WFRP4E_HUD.Groups.Miracles",
   [G.talents]: "WFRP4E_HUD.Groups.Talents",
@@ -30,7 +27,7 @@ export const GROUPS = {
 
 /**
  * Zakładki: id → klucz tłumaczenia i grupy w kolejności. Układ jak w pozostałych systemach:
- * Walka kończy się grupą Ekwipunek; umiejętności są w kolumnach według cech (`dynamic: "skills"`);
+ * Walka kończy się grupą Ekwipunek; umiejętności są w kolumnach według cech (`dynamic: "skills"`), a czary w kolumnach według szkoły magii (`dynamic: "magic"`);
  * stany są w zakładce Stan. Zakładka z `edition` jest tylko w tej edycji zasad.
  *
  * WFRP 4e ma osobną, pierwszą zakładkę Przewaga (użycia Przewagi, rozkazy szajki, licznik) – Przewaga
@@ -41,7 +38,7 @@ export const LAYOUT = [
   { id: "combat", name: "WFRP4E_HUD.Tabs.Combat", groups: [G.gangOrdersCombat, G.weaponsMelee, G.weaponsRanged, G.armour, G.traits, G.equipment] },
   { id: "characteristics", name: "WFRP4E_HUD.Tabs.Characteristics", groups: [G.characteristics] },
   { id: "skills", name: "WFRP4E_HUD.Tabs.Skills", columns: 4, dynamic: "skills", groups: [] },
-  { id: "magic", name: "WFRP4E_HUD.Tabs.Magic", groups: [G.channelledReset, G.petty, G.spells, G.channelling] },
+  { id: "magic", name: "WFRP4E_HUD.Tabs.Magic", columns: "auto", dynamic: "magic", groups: [G.channelledReset] },
   { id: "religion", name: "WFRP4E_HUD.Tabs.Religion", groups: [G.blessings, G.miracles] },
   { id: "talents", name: "WFRP4E_HUD.Tabs.Talents", groups: [G.talents, G.extended, G.effects] },
   { id: "status", name: "WFRP4E_HUD.Tabs.Status", groups: [G.conditions] },

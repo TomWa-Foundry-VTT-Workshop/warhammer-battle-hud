@@ -7,6 +7,7 @@ import { getEdition } from "./edition.mjs";
 import { resolveIntent } from "./intent.mjs";
 import { GROUPS, LAYOUT } from "./layout.mjs";
 import { performAction } from "./wfrp-actions.mjs";
+import { autoColumns } from "./system-panel.mjs";
 import { tooltipHtml } from "./tooltip.mjs";
 import { ACTION_TYPES as T } from "./encoding.mjs";
 
@@ -20,7 +21,6 @@ const collectEffects = (actor) => [...(actor.effects ?? []), ...[...(actor.items
 export function actionsByGroup(actor, env) {
   if (!FULL_ACTORS.includes(actor.type)) return { [G.conditions]: B.buildConditions(actor, env) };
   const weapons = B.buildWeapons(actor, env);
-  const spells = B.buildSpells(actor, env);
   const prayers = B.buildPrayers(actor, env);
   return {
     [G.characteristics]: B.buildCharacteristics(actor, env),
@@ -28,9 +28,6 @@ export function actionsByGroup(actor, env) {
     [G.weaponsRanged]: weapons.ranged,
     [G.armour]: B.buildArmour(actor, env),
     [G.traits]: B.buildTraits(actor, env),
-    [G.petty]: spells.petty,
-    [G.spells]: spells.spells,
-    [G.channelling]: spells.channelling,
     [G.blessings]: prayers.blessings,
     [G.miracles]: prayers.miracles,
     [G.talents]: B.buildTalents(actor, env),
@@ -94,20 +91,26 @@ export function buildPanel(actor, env) {
       text: action.tooltip,
       hint: hintFor(action, env)
     }),
-    cssClass: action.cssClass ?? ""
+    cssClass: action.cssClass ?? "",
+    secondary: action.secondary && {
+      ...action.secondary,
+      tooltip: tooltipHtml({ name: action.secondary.label, hint: env.localize("WFRP4E_HUD.Hint.RollItem") })
+    }
   });
   // Umiejętności w kolumnach według cech: grupy zależą od postaci, nie od stałego układu
-  const dynamic = { skills: () => (FULL_ACTORS.includes(actor.type) ? B.buildSkillGroups(actor, env) : []) };
-  return LAYOUT.filter((tab) => !tab.edition || tab.edition === (env.edition ?? "4e")).map((tab) => ({
-    id: tab.id,
-    label: env.localize(tab.name),
-    columns: tab.columns,
-    groups: tab.dynamic
-      ? dynamic[tab.dynamic]().map((group) => ({ label: group.label, actions: group.actions.map(view) }))
-      : tab.groups
-        .filter((id) => byGroup[id]?.length)
-        .map((id) => ({ label: env.localize(GROUPS[id]), actions: byGroup[id].map(view) }))
-  })).filter((tab) => tab.groups.length);
+  const dynamic = {
+    skills: () => (FULL_ACTORS.includes(actor.type) ? B.buildSkillGroups(actor, env) : []),
+    magic: () => (FULL_ACTORS.includes(actor.type) ? B.buildSpellGroups(actor, env) : [])
+  };
+  return LAYOUT.filter((tab) => !tab.edition || tab.edition === (env.edition ?? "4e")).map((tab) => {
+    const fixed = tab.groups
+      .filter((id) => byGroup[id]?.length)
+      .map((id) => ({ label: env.localize(GROUPS[id]), actions: byGroup[id].map(view) }));
+    const generated = (tab.dynamic ? dynamic[tab.dynamic]() : []).map((group) => ({ label: group.label, actions: group.actions.map(view) }));
+    // Zakładka z grupami stałymi i generowanymi (Magia: utrata splecionej mocy, potem szkoły)
+    const groups = [...fixed, ...generated];
+    return { id: tab.id, label: env.localize(tab.name), columns: autoColumns(tab.columns, generated.length), groups };
+  }).filter((tab) => tab.groups.length);
 }
 
 export function wfrpActions(getSetting) {

@@ -98,13 +98,15 @@ describe("builders", () => {
     expect(all.map((a) => [a.name, a.encodedValue.split("|")[0]])).toEqual([["Rozmiar", "talent"], ["Ugryzienie", "trait"]]);
   });
 
-  it("czary: magia prosta osobno, splatanie tylko w 4e", () => {
-    const s = B.buildSpells(actor, env);
-    expect(s.petty.map((a) => a.name)).toEqual(["Rzutka"]);
-    expect(s.petty[0].tooltip).toBe("Mała iskra");
-    expect(s.spells[0]).toMatchObject({ name: "Kula ognia", info1: { text: "7" } });
-    expect(s.channelling.map((a) => a.encodedValue.split("|")[0])).toEqual(["channel"]);
-    expect(B.buildSpells(actor, { ...env, edition: "5e" }).channelling).toEqual([]);
+  it("czary w kolumnach szkół: Magia Prosta bez splatania, przycisk splatania tylko w 4e", () => {
+    const all = B.buildSpellGroups(actor, env).flatMap((g) => g.actions);
+    const petty = all.find((a) => a.name === "Rzutka");
+    const fireball = all.find((a) => a.name === "Kula ognia");
+    expect(petty.tooltip).toBe("Mała iskra");
+    expect(petty.secondary).toBeUndefined();
+    expect(fireball).toMatchObject({ info1: { text: "7" } });
+    expect(fireball.secondary.value.split("|")[0]).toBe("channel");
+    expect(B.buildSpellGroups(actor, { ...env, edition: "5e" }).flatMap((g) => g.actions).every((a) => !a.secondary)).toBe(true);
   });
 
   it("modlitwy: błogosławieństwa i cuda", () => {
@@ -172,14 +174,17 @@ describe("poprawki broni i splatania", () => {
     expect(B.buildWeapons(fighter([weapon("B", true), weapon("A", false)]), envOnly).melee.map((a) => a.name)).toEqual(["B"]);
   });
 
-  const mage = { type: "character", itemTypes: { spell: [{ id: "s1", name: "Kula", system: { lore: { value: "fire" }, cn: { value: 5 } } }] }, system: { status: { channelling: { wind: "aqshy", value: 3, winds: { aqshy: { label: "Aqshy", img: "a.webp" }, ghur: { label: "Ghur", img: "g.webp" } } } } } };
-  it("5e: splatanie według Wiatru, z bieżącą wartością", () => {
-    const { channelling } = B.buildSpells(mage, { ...envOnly, edition: "5e" });
-    expect(channelling.map((a) => a.encodedValue)).toEqual(["channelWind|aqshy", "channelWind|ghur"]);
-    expect(channelling[0]).toMatchObject({ name: "L(Aqshy)", img: "a.webp", info1: { text: "3" } });
-    expect(channelling[1].info1).toBeUndefined();
+  const mage = { type: "character", itemTypes: { spell: [{ id: "s1", name: "Kula", system: { lore: { value: "fire" }, cn: { value: 5 } } }] }, system: { status: { channelling: { wind: "aqshy", value: 3, winds: { aqshy: { label: "Aqshy", img: "a.webp" } } } } } };
+  const config5e = { magicLores: { fire: "Fire" }, loreWind: { fire: "aqshy" }, magicWind: { aqshy: "Wind.Aqshy" } };
+  it("5e: przycisk Wiatru na górze kolumny jego tradycji, z zebraną mocą", () => {
+    const [fire] = B.buildSpellGroups(mage, { ...envOnly, edition: "5e", config: config5e });
+    expect(fire.label).toBe("L(Fire) (L(Wind.Aqshy))");
+    expect(fire.actions.map((a) => a.encodedValue)).toEqual(["channelWind|aqshy", "spell|s1"]);
+    expect(fire.actions[0]).toMatchObject({ name: "L(WFRP4E_HUD.Groups.Channelling): L(Aqshy)", img: "a.webp", info1: { text: "3" }, cssClass: "channelled" });
   });
-  it("4e: splatanie według czaru, bez Wiatrów", () => {
-    expect(B.buildSpells(mage, envOnly).channelling.map((a) => a.encodedValue)).toEqual(["channel|s1"]);
+  it("4e: splatanie przy czarze, bez przycisków Wiatrów", () => {
+    const [fire] = B.buildSpellGroups(mage, { ...envOnly, config: { magicLores: { fire: "Fire" } } });
+    expect(fire.actions.map((a) => a.encodedValue)).toEqual(["spell|s1"]);
+    expect(fire.actions[0].secondary).toMatchObject({ value: "channel|s1", icon: "fa-solid fa-wind" });
   });
 });

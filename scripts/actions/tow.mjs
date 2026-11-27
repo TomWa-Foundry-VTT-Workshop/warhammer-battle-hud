@@ -3,7 +3,7 @@
  * (te same metody, których używa karta postaci).
  */
 import * as B from "./tow-builders.mjs";
-import { finishPanel, systemActions, testContext } from "./system-panel.mjs";
+import { finishPanel, groupBySchool, systemActions, testContext } from "./system-panel.mjs";
 import { setTowEquipped } from "../grimoire-equipment.mjs";
 
 const TOW = B.TOW;
@@ -47,7 +47,19 @@ export function towPanel(actor, e = env()) {
       ]
     },
     { id: "skills", columns: 4, groups: B.buildSkillGroups(actor, e) },
-    { id: "magic", groups: [group("Casting", magic.lores), group("Spells", magic.spells), group("Miscasts", magic.miscasts)] },
+    // Kolumny według tradycji: rzucanie z tradycji na górze, pod nim jej zaklęcia; Miscasty osobno
+    {
+      id: "magic",
+      columns: "auto",
+      groups: [
+        ...groupBySchool([...magic.lores, ...magic.spells], {
+          order: Object.keys(e.config?.magicLore ?? {}),
+          labelOf: (key) => (e.config?.magicLore?.[key] ? e.localize(e.config.magicLore[key]) : key),
+          otherLabel: label("Groups.Spells")
+        }),
+        group("Miscasts", magic.miscasts)
+      ]
+    },
     { id: "religion", groups: [group("Blessing", B.buildBlessing(actor, e))] },
     { id: "talents", groups: [group("Talents", usable.talents), group("Abilities", usable.abilities), group("Lores", usable.lores)] },
     // Stan jak w pozostałych systemach: Los, stany i rany (z przyciskiem dodania rany)

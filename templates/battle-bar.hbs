@@ -63,11 +63,18 @@
             <h4>{{label}}</h4>
             <div class="whb-actions">
               {{#each actions}}
+                {{#if secondary}}<div class="whb-pair">{{/if}}
                 <button type="button" class="whb-action {{cssClass}}" data-action="runAction" data-value="{{value}}" {{#if tooltip}}data-tooltip-html="{{tooltip}}" data-tooltip-class="whb-tooltip"{{/if}}>
                   {{#if img}}<img src="{{img}}" alt="">{{/if}}
                   <span>{{name}}</span>
                   {{#if detail}}<small>{{detail}}</small>{{/if}}
                 </button>
+                {{#if secondary}}
+                  <button type="button" class="whb-action whb-secondary" data-action="runAction" data-value="{{secondary.value}}" data-tooltip-html="{{secondary.tooltip}}" data-tooltip-class="whb-tooltip" aria-label="{{secondary.label}}">
+                    <i class="{{secondary.icon}}" inert></i>
+                  </button>
+                </div>
+                {{/if}}
               {{/each}}
             </div>
           </section>

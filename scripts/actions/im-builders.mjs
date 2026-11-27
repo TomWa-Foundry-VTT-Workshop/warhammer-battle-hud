@@ -210,6 +210,7 @@ export function buildPsychic(actor, env) {
   const powerActions = powers.map((power) => {
     const s = power.system ?? {};
     return {
+      school: s.discipline ?? "",
       name: power.name,
       img: power.img,
       value: imValue(IM.power, power.id),

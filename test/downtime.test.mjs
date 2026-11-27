@@ -36,10 +36,10 @@ describe("WFRP: splatanie", () => {
     { id: "s1", name: "Wybuch", system: { lore: { value: "metal" }, cn: { value: 4, SL: 2 } } },
     { id: "s2", name: "Pancerz", system: { lore: { value: "metal" }, cn: { value: 2, SL: 0 } } }
   ] } };
-  it("4e: zebrane PS przy zaklęciu i w splataniu, z wyróżnieniem", () => {
-    const { spells, channelling } = B.buildSpells(mage, env);
-    expect(spells.map((s) => [s.name, s.info1.text, s.cssClass])).toEqual([["Pancerz", "2", undefined], ["Wybuch", "2/4", "channelled"]]);
-    expect(channelling.find((c) => c.name === "Wybuch").info1.text).toBe("2/4");
+  it("4e: zebrane PS przy zaklęciu, z wyróżnieniem i przyciskiem splatania", () => {
+    const [metal] = B.buildSpellGroups(mage, env);
+    expect(metal.actions.map((s) => [s.name, s.info1.text, s.cssClass])).toEqual([["Pancerz", "2", undefined], ["Wybuch", "2/4", "channelled"]]);
+    expect(metal.actions[1].secondary.value).toBe("channel|s1");
   });
   it("utrata splecionej mocy pojawia się tylko, gdy jest co tracić", () => {
     expect(B.buildChannelledReset(mage, env)).toMatchObject([{ encodedValue: "channelReset", info1: { text: "2" } }]);

@@ -7,6 +7,7 @@
  * i zwraca listę danych akcji w formacie TAH Core: { id, name, encodedValue, img?, info1?, cssClass?, tooltip? }.
  */
 import { ACTION_TYPES as T, encodeAction } from "./encoding.mjs";
+import { groupBySchool } from "./system-panel.mjs";
 import { equippableGrimoires } from "../grimoire-equipment.mjs";
 
 /** Grupy HUD (id grup TAH) – układ w scripts/defaults.mjs. */
@@ -16,9 +17,6 @@ export const GROUP_IDS = Object.freeze({
   weaponsRanged: "weapons-ranged",
   armour: "armour",
   traits: "traits",
-  petty: "spells-petty",
-  spells: "spells",
-  channelling: "channelling",
   blessings: "blessings",
   miracles: "miracles",
   talents: "talents",
@@ -260,16 +258,30 @@ function castingDetails(item, env, cn) {
   ];
 }
 
-/** Czary: Magia Prosta osobno; reszta z nazwą tradycji. Splatanie osobno: w 4e według czaru, w 5e według Wiatru. */
-export function buildSpells(actor, env) {
-  const petty = [];
-  const spells = [];
-  const channelling = [];
+/** Nagłówek szkoły: nazwa tradycji i jej Wiatr, np. „Fire (Aqshy)”. */
+function loreLabel(env, lore) {
+  const name = env.config?.magicLores?.[lore] ? env.localize(env.config.magicLores[lore]) : lore;
+  const windKey = env.config?.loreWind?.[lore] ?? lore;
+  const windLabel = env.config?.magicWind?.[windKey];
+  const wind = windLabel ? env.localize(windLabel) : "";
+  // Tradycje bez Wiatru mają w systemie nazwę „None” (jak Magia Prosta)
+  const none = env.localize("WFRP4E.MagicWind.petty");
+  return wind && wind !== windLabel && wind !== none && wind !== name ? `${name} (${wind})` : name;
+}
+
+/**
+ * Czary w kolumnach według szkoły magii (jak umiejętności według cech). 4e: splata się czar, więc przy
+ * czarze (poza Magią Prostą) jest mały przycisk splatania. 5e: splata się Wiatr, więc przycisk Wiatru
+ * stoi na górze kolumny jego tradycji.
+ */
+export function buildSpellGroups(actor, env) {
+  const actions = [];
   for (const spell of [...items(actor, "spell")].sort(byName)) {
-    const lores = [spell.system?.lore?.value].flat().filter(Boolean);
+    // Czar z kilkoma tradycjami trafia do pierwszej, żeby się nie powtarzał
+    const lore = String([spell.system?.lore?.value].flat().filter(Boolean)[0] ?? "");
     const cn = spell.system?.cn?.value;
     const tooltip = plainDescription(spell) || undefined;
-    const isPetty = lores.includes("petty");
+    const isPetty = lore === "petty";
     // 4e: Poziomy Sukcesu splatania zbierają się w zaklęciu (cn.SL) aż do rzucenia albo porażki
     const channelled = env.edition !== "5e" ? Number(spell.system?.cn?.SL) || 0 : 0;
     const info1 = channelled > 0
@@ -277,30 +289,41 @@ export function buildSpells(actor, env) {
       : cn ? { text: String(cn), title: env.localize("WFRP4E_HUD.Info.CN") } : undefined;
     const details = [...castingDetails(spell, env, cn), tip(env, "Channelled", channelled > 0 ? `${channelled} / ${cn}` : undefined)];
     const cssClass = channelled > 0 ? "channelled" : undefined;
-    (isPetty ? petty : spells).push(itemAction(spell, T.spell, { info1, tooltip, details, cssClass }));
+    const action = itemAction(spell, T.spell, { info1, tooltip, details, cssClass, school: lore });
     if (!isPetty && cn && env.edition !== "5e") {
-      channelling.push({
-        ...itemAction(spell, T.channel, { info1, tooltip, details, cssClass }),
-        id: `${T.channel}-${spell.id}`
-      });
+      action.secondary = {
+        value: encodeAction(T.channel, spell.id),
+        icon: "fa-solid fa-wind",
+        label: `${env.localize("WFRP4E_HUD.Groups.Channelling")}: ${spell.name}`
+      };
     }
+    actions.push(action);
   }
+
+  const order = Object.keys(env.config?.magicLores ?? {});
+  const groups = groupBySchool(actions, { order, labelOf: (lore) => loreLabel(env, lore), otherLabel: env.localize("WFRP4E_HUD.Groups.NoLore") });
+
   if (env.edition === "5e") {
     const status = actor.system?.status?.channelling;
-    for (const [wind, data] of Object.entries(status?.winds ?? {})) {
-      channelling.push({
+    for (const group of groups) {
+      const lore = group.actions[0].school;
+      const wind = env.config?.loreWind?.[lore] ?? lore;
+      const data = status?.winds?.[wind];
+      if (!data) continue;
+      // 5e: zebrana moc należy do postaci i do jednego Wiatru naraz
+      const held = status.wind === wind && status.value > 0;
+      group.actions.unshift({
         id: `${T.channelWind}-${wind}`,
-        name: env.localize(data.label),
+        name: `${env.localize("WFRP4E_HUD.Groups.Channelling")}: ${env.localize(data.label)}`,
         img: data.img,
         encodedValue: encodeAction(T.channelWind, wind),
-        // 5e: zebrana moc należy do postaci i do jednego Wiatru naraz
-        info1: status.wind === wind && status.value > 0 ? { text: String(status.value), title: env.localize("WFRP4E_HUD.Tip.Channelled") } : undefined,
-        cssClass: status.wind === wind && status.value > 0 ? "channelled" : undefined,
-        details: [tip(env, "Channelled", status.wind === wind && status.value > 0 ? status.value : undefined)]
+        info1: held ? { text: String(status.value), title: env.localize("WFRP4E_HUD.Tip.Channelled") } : undefined,
+        cssClass: held ? "channelled" : undefined,
+        details: [tip(env, "Channelled", held ? status.value : undefined)]
       });
     }
   }
-  return { petty, spells, channelling };
+  return groups;
 }
 
 export function buildPrayers(actor, env = NO_ENV) {

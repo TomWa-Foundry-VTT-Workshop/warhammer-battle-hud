@@ -3,7 +3,7 @@
  * (te same metody, których używa karta postaci).
  */
 import * as B from "./wng-builders.mjs";
-import { finishPanel, systemActions, testContext } from "./system-panel.mjs";
+import { finishPanel, groupBySchool, systemActions, testContext } from "./system-panel.mjs";
 
 const WNG = B.WNG;
 const ITEM_BACKED = new Set([WNG.weapon, WNG.armour, WNG.power, WNG.ability, WNG.sheet, WNG.equip]);
@@ -20,7 +20,7 @@ export function wngPanel(actor, e = env()) {
     { id: "combat", groups: [group("Melee", combat.melee), group("Ranged", combat.ranged), group("Tests", combat.tests), group("Armour", combat.armour), group("Equipment", B.buildEquipment(actor, e))] },
     { id: "attributes", groups: [group("Attributes", B.buildAttributes(actor, e))] },
     { id: "skills", columns: 4, groups: B.buildSkillGroups(actor, e) },
-    { id: "powers", groups: [group("Powers", B.buildPowers(actor, e))] },
+    { id: "powers", columns: "auto", groups: groupBySchool(B.buildPowers(actor, e), { labelOf: (key) => key, otherLabel: label("Groups.Powers") }) },
     { id: "abilities", groups: [group("Abilities", abilities.abilities), group("Talents", abilities.talents), group("Keywords", abilities.keywords)] },
     { id: "status", groups: [group("Resources", status.resources), group("Conditions", status.conditions), group("Injuries", status.injuries)] },
     { id: "downtime", groups: [group("Social", status.social)] }
