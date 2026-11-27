@@ -285,6 +285,7 @@ export function buildMagic(actor, env) {
   const castLore = lores.map(([key, lore]) => ({
     name: `${env.localize("WHB_TOW.Cast")}: ${lore.label}`,
     value: towValue(TOW.castLore, key),
+    school: key,
     detail: lore.progress ? String(lore.progress) : "",
     tooltip: { details: [tip(env, "Progress", lore.progress || undefined)], hint: hint(env, "Cast") }
   }));
@@ -295,6 +296,7 @@ export function buildMagic(actor, env) {
       name: spell.name,
       img: spell.img,
       value: towValue(TOW.spell, spell.uuid, s.lore ?? ""),
+      school: s.lore ?? "",
       detail: s.progress ? `${s.progress}/${s.cv}` : String(s.cv ?? ""),
       tooltip: {
         details: [

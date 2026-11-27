@@ -12,6 +12,26 @@ export function readPanelValue(value, types) {
   return Object.values(types).includes(type) ? { type, id, extra } : null;
 }
 
+/**
+ * Kolumny magii według szkoły (tradycji, dyscypliny): kolejność z konfiguracji systemu, potem pozostałe
+ * alfabetycznie, a bez szkoły na końcu. Używane we wszystkich systemach.
+ */
+export function groupBySchool(actions, { labelOf, order = [], otherLabel }) {
+  const groups = new Map();
+  for (const action of actions) {
+    const key = String(action.school ?? "").trim();
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(action);
+  }
+  const rank = (key) => (key === "" ? Number.MAX_SAFE_INTEGER : order.includes(key) ? order.indexOf(key) : order.length);
+  return [...groups]
+    .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
+    .map(([key, list]) => ({ label: key ? labelOf(key) : otherLabel, actions: list }));
+}
+
+/** Liczba kolumn dla zakładki z `columns: "auto"`: tyle, ile grup, najwyżej cztery. */
+export const autoColumns = (columns, groups) => (columns === "auto" ? Math.min(4, Math.max(1, groups)) : columns);
+
 /** Zakładki do pokazania: puste grupy i zakładki znikają, każda akcja dostaje gotową podpowiedź HTML. */
 export function finishPanel(tabs, label) {
   const view = (action) => ({
@@ -23,12 +43,10 @@ export function finishPanel(tabs, label) {
     tooltip: tooltipHtml({ name: action.name, ...action.tooltip })
   });
   return tabs
-    .map((tab) => ({
-      id: tab.id,
-      columns: tab.columns,
-      label: label(`Tabs.${tab.id}`),
-      groups: tab.groups.filter((g) => g.actions.length).map((g) => ({ ...g, actions: g.actions.map(view) }))
-    }))
+    .map((tab) => {
+      const groups = tab.groups.filter((g) => g.actions.length).map((g) => ({ ...g, actions: g.actions.map(view) }));
+      return { id: tab.id, columns: autoColumns(tab.columns, groups.length), label: label(`Tabs.${tab.id}`), groups };
+    })
     .filter((tab) => tab.groups.length);
 }
 

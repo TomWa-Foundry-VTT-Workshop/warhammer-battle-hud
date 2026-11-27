@@ -146,6 +146,7 @@ export function buildPowers(actor, env) {
       name: power.name,
       img: power.img,
       value: v(WNG.power, power.id),
+      school: s.discipline ?? "",
       detail: s.dn ? `DN ${s.dn}` : "",
       tooltip: {
         details: [

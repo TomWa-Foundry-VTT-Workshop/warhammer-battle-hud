@@ -137,6 +137,7 @@ export function buildPowers(actor, env) {
       name: item.name,
       img: item.img,
       value: v(type, item.id),
+      school: s.lore ?? "",
       detail: type === SB.spell ? String(s.dn ?? "") : s.cost ? String(s.cost) : "",
       tooltip: {
         details: [

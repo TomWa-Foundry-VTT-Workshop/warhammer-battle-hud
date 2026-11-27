@@ -188,8 +188,6 @@
       "Ranged": "Broń dystansowa",
       "Armour": "Pancerz",
       "Traits": "Cechy stworzeń",
-      "Petty": "Magia prosta",
-      "Spells": "Zaklęcia",
       "Channelling": "Splatanie",
       "Blessings": "Błogosławieństwa",
       "Miracles": "Cuda",
@@ -202,7 +200,8 @@
       "GangOrders": "Rozkazy szajki",
       "Downtime": "Między przygodami",
       "ChannelledReset": "Spleciona moc",
-      "Equipment": "Ekwipunek"
+      "Equipment": "Ekwipunek",
+      "NoLore": "Bez tradycji"
     },
     "Info": {
       "Damage": "Uszkodzenie przedmiotu",

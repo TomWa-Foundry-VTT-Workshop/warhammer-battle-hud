@@ -3,7 +3,7 @@
  * (te same metody, których używa karta postaci).
  */
 import * as B from "./sb-builders.mjs";
-import { finishPanel, systemActions, testContext } from "./system-panel.mjs";
+import { finishPanel, groupBySchool, systemActions, testContext } from "./system-panel.mjs";
 
 const SB = B.SB;
 const ITEM_BACKED = new Set([SB.weapon, SB.armour, SB.spell, SB.miracle, SB.equip]);
@@ -18,7 +18,7 @@ export function sbPanel(actor, e = env()) {
   return finishPanel([
     { id: "combat", groups: [group("Melee", combat.melee), group("Ranged", combat.ranged), group("Combat", combat.other), group("Armour", combat.armour), group("Equipment", B.buildEquipment(actor, e))] },
     { id: "skills", columns: 4, groups: [group("Attributes", B.buildAttributes(actor, e)), ...B.buildSkillGroups(actor, e)] },
-    { id: "powers", groups: [group("Spells", powers.spells), group("Miracles", powers.miracles)] },
+    { id: "powers", columns: "auto", groups: [...groupBySchool(powers.spells, { labelOf: (key) => key, otherLabel: label("Groups.Spells") }), group("Miracles", powers.miracles)] },
     { id: "talents", groups: [group("Talents", B.buildTalents(actor, e))] },
     // „Stan” jak w pozostałych systemach
     { id: "status", groups: [group("Conditions", B.buildConditions(actor, e))] }

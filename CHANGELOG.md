@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Magic is arranged in columns by school, like skills by characteristic. WFRP: one column per lore with its Wind in the header ("Fire (Aqshy)"); 4th edition has a small channelling button next to each spell instead of a second list, 5th edition a "Channelling" button for the Wind at the top of its lore. The Old World: "Cast" for the lore on top, its spells below, Miscasts apart. Imperium Maledictum and Wrath & Glory: psychic powers by discipline. Soulbound: spells by lore, miracles apart.
+
 ## 0.8.7
 - **WFRP4e Grimoires**: grimoires that are held in hand show up in the Equipment list and in the hands widget. In WFRP a grimoire takes one or two hands, as set on the book; in The Old World clicking it equips or unequips it.
 - WFRP: if taking up a weapon or book fails, the items that were put away to free the hands are taken up again.

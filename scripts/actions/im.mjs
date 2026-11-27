@@ -3,7 +3,7 @@
  * (te same metody, których używa karta postaci).
  */
 import * as B from "./im-builders.mjs";
-import { finishPanel, systemActions, testContext } from "./system-panel.mjs";
+import { finishPanel, groupBySchool, systemActions, testContext } from "./system-panel.mjs";
 import { t } from "./constants.mjs";
 
 const IM = B.IM;
@@ -31,7 +31,18 @@ export function imPanel(actor, e = env()) {
     { id: "combat", groups: [group("Actions", B.buildActions(e)), group("Melee", combat.melee), group("Ranged", combat.ranged), group("Reload", combat.reload), group("Defence", combat.defence), group("Traits", combat.traits), group("Protection", combat.protection), group("Equipment", B.buildEquipment(actor, e))] },
     { id: "characteristics", groups: [group("Characteristics", B.buildCharacteristics(actor, e))] },
     { id: "skills", columns: 4, groups: B.buildSkillGroups(actor, e) },
-    { id: "psychic", groups: [group("Powers", psychic.powers), group("Warp", psychic.warp)] },
+    {
+      id: "psychic",
+      columns: "auto",
+      groups: [
+        ...groupBySchool(psychic.powers, {
+          order: Object.keys(e.config?.disciplines ?? {}),
+          labelOf: (key) => (e.config?.disciplines?.[key] ? e.localize(e.config.disciplines[key]) : key),
+          otherLabel: label("Groups.Powers")
+        }),
+        group("Warp", psychic.warp)
+      ]
+    },
     { id: "talents", groups: [group("Talents", talents.talents), group("Traits", talents.traits), group("Corruption", talents.corruption)] },
     { id: "status", groups: [group("Fate", status.fate), group("Conditions", status.conditions), group("Injuries", status.injuries)] }
   ];
